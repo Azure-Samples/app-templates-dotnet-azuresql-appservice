@@ -1,0 +1,112 @@
+name: ContosoUniversity
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'infra/**'
+      - '**/ContosoUniversity - Infra.yml'
+      - '**/README.md'
+  pull_request:
+    branches: 
+      - main
+    paths-ignore:
+      - 'infra/**'
+# We also want to be able to run this manually from Github
+  workflow_dispatch:
+  
+env:
+  CONFIGURATION: release
+  AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
+  AZ_API_NAME: ${{ secrets.AZURE_APP_NAME }}-api
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Restore
+      run: dotnet restore src/ContosoUniversity.sln
+    
+    - name: Build
+      run: dotnet build src/ContosoUniversity.sln --configuration ${{ env.CONFIGURATION }} --no-restore
+    
+    - name: Test
+      run: dotnet test src/ContosoUniversity.Test/ContosoUniversity.Test.csproj --verbosity normal --logger trx --results-directory TestResults
+      
+    - name: Publish APP
+      run: dotnet publish --configuration ${{ env.CONFIGURATION }} --output PublishApp src/ContosoUniversity.WebApplication/ContosoUniversity.WebApplication.csproj
+
+    - name: Publish API
+      run: dotnet publish --configuration ${{ env.CONFIGURATION }} --output PublishApi src/ContosoUniversity.API/ContosoUniversity.API.csproj
+    
+    - name: Upload APP results
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: PublishApp
+    
+    - name: Upload API results
+      uses: actions/upload-artifact@v2
+      with:
+        name: api
+        path: PublishApi
+  
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download APP Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app
+          path: app-artifact
+      
+      - name: Download API Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: api
+          path: api-artifact
+      
+      - name: Variable Substitution API
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: api-artifact/appsettings.json
+        env:
+          ConnectionStrings.ContosoUniversityAPIContext: ${{ secrets.AZURE_CONTOSO_CONN_STRING }}
+          ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
+      
+      - name: Variable Substitution APP
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: app-artifact/appsettings.json
+        env:
+          Api.Address: https://${{ env.AZ_API_NAME }}.azurewebsites.net/
+          ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
+      
+      - name: Azure Login
+        uses: Azure/login@v1.4.4
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy API
+        uses: azure/webapps-deploy@v2.2.3
+        with:
+          app-name: ${{ env.AZ_API_NAME }}
+          package: api-artifact
+      
+      - name: Deploy APP
+        uses: azure/webapps-deploy@v2.2.3
+        with:
+          app-name: ${{ env.AZ_APP_NAME }}
+          package: app-artifact

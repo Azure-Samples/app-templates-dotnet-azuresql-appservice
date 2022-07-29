@@ -1,0 +1,48 @@
+name: ContosoUniversity-Infra
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      
+  # We also want to be able to run this manually from Github
+  workflow_dispatch:
+  
+env:
+  AZ_RG_NAME: 'rg-ContosoUniversityDemo'
+  AZ_LOCATION: 'eastus'
+  AZ_SERVICE_PLAN: ${{secrets.AZURE_APP_NAME}}-asp
+  AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
+  AZ_API_NAME: ${{secrets.AZURE_APP_NAME}}-api
+  AZ_INSIGHT_NAME: ${{secrets.AZURE_APP_NAME}}-appi
+  AZ_ANALYTICS_NAME: ${{secrets.AZURE_APP_NAME}}-la
+  AZ_SQL_SERVER_NAME: ${{secrets.AZURE_APP_NAME}}-sql
+  AZ_SQL_SERVER_LOGIN: 'sqluser'
+  AZ_SQL_SERVER_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+  AZ_SQL_DATABASE_NAME: ${{secrets.AZURE_APP_NAME}}-Db
+
+jobs:
+  infra:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Azure Login
+      uses: Azure/login@v1.4.4
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy Template
+      uses: Azure/arm-deploy@v1.0.8
+      with:
+        scope: resourcegroup
+        resourceGroupName: ${{ env.AZ_RG_NAME }}
+        template: infra/main.bicep
+        deploymentMode: Incremental
+        deploymentName: 'gh-actions'
+        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} sqlAdministratorLogin=${{ env.AZ_SQL_SERVER_LOGIN }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }}
+        failOnStdErr: false

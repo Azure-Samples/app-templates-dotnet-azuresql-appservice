@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContosoUniversity.WebApplication", "ContosoUniversity.WebApplication\ContosoUniversity.WebApplication.csproj", "{76DDF82E-58A3-4122-844D-151CA2C81F9E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContosoUniversity.API", "ContosoUniversity.API\ContosoUniversity.API.csproj", "{DF42193F-5EFE-4FD1-9E14-3A4D4F7BB4AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContosoUniversity.CodedUITest", "ContosoUniversity.CodedUITest\ContosoUniversity.CodedUITest.csproj", "{0FC969C1-3DC0-4A33-BF27-7196E51BFD03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContosoUniversity.Test", "ContosoUniversity.Test\ContosoUniversity.Test.csproj", "{36B19D13-F27D-461F-A21F-4EF417C05CFC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{66743DFB-9BD7-482D-B066-21DC764ED914}"
+	ProjectSection(SolutionItems) = preProject
+		..\infra\ContainerRegistry.bicep = ..\infra\ContainerRegistry.bicep
+		..\infra\HELP.txt = ..\infra\HELP.txt
+		..\infra\KeyVault.bicep = ..\infra\KeyVault.bicep
+		..\infra\Kubernetes.bicep = ..\infra\Kubernetes.bicep
+		..\infra\main.bicep = ..\infra\main.bicep
+		..\infra\SQLServer.bicep = ..\infra\SQLServer.bicep
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76DDF82E-58A3-4122-844D-151CA2C81F9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DDF82E-58A3-4122-844D-151CA2C81F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DDF82E-58A3-4122-844D-151CA2C81F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DDF82E-58A3-4122-844D-151CA2C81F9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF42193F-5EFE-4FD1-9E14-3A4D4F7BB4AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF42193F-5EFE-4FD1-9E14-3A4D4F7BB4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF42193F-5EFE-4FD1-9E14-3A4D4F7BB4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF42193F-5EFE-4FD1-9E14-3A4D4F7BB4AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC969C1-3DC0-4A33-BF27-7196E51BFD03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC969C1-3DC0-4A33-BF27-7196E51BFD03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC969C1-3DC0-4A33-BF27-7196E51BFD03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC969C1-3DC0-4A33-BF27-7196E51BFD03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36B19D13-F27D-461F-A21F-4EF417C05CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36B19D13-F27D-461F-A21F-4EF417C05CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36B19D13-F27D-461F-A21F-4EF417C05CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36B19D13-F27D-461F-A21F-4EF417C05CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08BCE680-4B87-4F9D-AE2C-60BC289C5588}
+	EndGlobalSection
+EndGlobal

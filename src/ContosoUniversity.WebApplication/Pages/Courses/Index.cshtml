@@ -1,0 +1,58 @@
+﻿@page
+@model ContosoUniversity.WebApplication.Pages.Courses.IndexModel
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<h2 id="title">@ViewData["Title"]</h2>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+
+@if (Model.Course.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Course.Courses[0].Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Course.Courses[0].Credits)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Course.Courses[0].Department)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Course.Courses)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Credits)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department.Name)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data</p>
+}

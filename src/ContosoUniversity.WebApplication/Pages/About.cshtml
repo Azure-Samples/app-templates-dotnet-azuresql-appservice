@@ -1,0 +1,16 @@
+﻿@page
+@model AboutModel
+
+@{
+    ViewData["Title"] = "About";
+}
+
+<h2 id="title">About</h2>
+
+<p class="text-danger">@Model.Msg</p>
+
+<p><b>Machine Name:</b> @Environment.MachineName</p>
+
+<p><b>OS Description:</b> @System.Runtime.InteropServices.RuntimeInformation.OSDescription</p>
+
+<p><b>Azure Region:</b> @System.Environment.GetEnvironmentVariable("REGION_NAME")</p>
