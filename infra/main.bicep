@@ -125,6 +125,7 @@ resource appServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
   parent: appService
   properties: {
     APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
+    APPLICATIONINSIGHTS_CONNECTION_STRING: APPINSIGHTS_CONNECTION_STRING
   }
   dependsOn: [
     appServiceSiteExtension
@@ -135,7 +136,9 @@ resource apiServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
   name: 'appsettings'
   parent: apiService
   properties: {
+    AZURE_SQL_CONNECTION_STRING: AZURE_SQL_CONNECTION_STRING
     APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
+    APPLICATIONINSIGHTS_CONNECTION_STRING: APPINSIGHTS_CONNECTION_STRING
   }
   dependsOn: [
     apiServiceSiteExtension
@@ -195,10 +198,20 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
     ProjectName: 'ContosoUniversity'
   }
   properties: {
-    administratorLogin: sqlAdministratorLogin
-    administratorLoginPassword: sqlAdministratorLoginPassword
+    //administratorLogin: sqlAdministratorLogin
+    //administratorLoginPassword: sqlAdministratorLoginPassword
     version: '12.0'
-  }
+    minimalTlsVersion: '1.2'
+    publicNetworkAccess: 'Enabled'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      principalType: 'User'
+      sid: apiService.identity.principalId
+      login: 'activedirectoryadmin'
+      tenantId: apiService.identity.tenantId
+      azureADOnlyAuthentication: true
+    }
+}
 }
 
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-02-01-preview' = {
@@ -230,3 +243,9 @@ resource symbolicname 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' =
     startIpAddress: '0.0.0.0'
   }
 }
+
+
+// Defined as a var here because it is used above
+
+var AZURE_SQL_CONNECTION_STRING = 'Server=${sqlServer.properties.fullyQualifiedDomainName}; Authentication=Active Directory Default; Database=${databaseName};'
+var  APPINSIGHTS_CONNECTION_STRING = appInsights.properties.ConnectionString
