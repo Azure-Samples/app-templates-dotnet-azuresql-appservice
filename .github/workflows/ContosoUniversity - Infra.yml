@@ -7,10 +7,6 @@ on:
     paths:
       - 'infra/**'
 
-  pull_request:
-    branches: 
-      - main
-      
   # We also want to be able to run this manually from Github
   workflow_dispatch:
   
