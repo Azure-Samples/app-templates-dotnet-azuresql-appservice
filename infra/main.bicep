@@ -11,11 +11,11 @@ param analyticsName string
 param location string = resourceGroup().location
 
 param serverName string
-//Used so we can setup an AAD login to the database using the Managed Identity of the App Service
 param sqlAdministratorLogin string
 @secure()
 param sqlAdministratorLoginPassword string
 param databaseName string
+
 @description('Name of the Service Principal that runs deployments')
 param sqlAdministratorAadName string
 @description('ClientId of the Service Principal that runs deployments')
