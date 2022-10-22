@@ -78,22 +78,6 @@ jobs:
           name: api
           path: api-artifact
       
-      - name: Variable Substitution API
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: api-artifact/appsettings.json
-        env:
-          ConnectionStrings.ContosoUniversityAPIContext: ${{ secrets.AZURE_CONTOSO_CONN_STRING }}
-          ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
-      
-      - name: Variable Substitution APP
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: app-artifact/appsettings.json
-        env:
-          Api.Address: https://${{ env.AZ_API_NAME }}.azurewebsites.net/
-          ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
-      
       - name: Azure Login
         uses: Azure/login@v1.4.4
         with:

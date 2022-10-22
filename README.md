@@ -96,7 +96,11 @@ Create AZURE_APP_NAME as New Repository Secret and provide a secret value. This 
 
 ### Azure SQL Configuration
 
-Add AZURE_SQL_PASSWORD as New Repository Secret and provide a secret value. This will be used as the user credential password for Azure SQL resource.
+AAD is used to access Azure SQL. 
+
+ - Add ```AZ_SQL_AAD_ADMIN_NAME``` as a Repository Secret and provide the name you gave your Github Actions service principal
+ - Assign AAD Read permissions to the Service Principal. See this [link](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-azure-ad-user-assigned-managed-identity?view=azuresql) for more details.
+ > Assigning AAD users in SQL Database requires an AAD lookup. This is why AAD permissions are required against the Service Principal running the deployment. AAD permissions can take a few minutes to propagate.
 
 ### GitHub Workflow 
 Run the GitHub Action workflow "ContosoUniversity-Infra"

@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - 'infra/**'
+
+  pull_request:
+    branches: 
+      - main
       
   # We also want to be able to run this manually from Github
   workflow_dispatch:
@@ -13,6 +17,7 @@ on:
 env:
   AZ_RG_NAME: 'rg-ContosoUniversityDemo'
   AZ_LOCATION: 'eastus'
+  AZ_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
   AZ_SERVICE_PLAN: ${{secrets.AZURE_APP_NAME}}-asp
   AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
   AZ_API_NAME: ${{secrets.AZURE_APP_NAME}}-api
@@ -22,6 +27,7 @@ env:
   AZ_SQL_SERVER_LOGIN: 'sqluser'
   AZ_SQL_SERVER_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
   AZ_SQL_DATABASE_NAME: ${{secrets.AZURE_APP_NAME}}-Db
+  AZ_SQL_AAD_ADMIN_NAME: ${{secrets.AZURE_SQL_AAD_ADMIN_NAME}}
 
 jobs:
   infra:
@@ -37,6 +43,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Deploy Template
+      id: deploy
       uses: Azure/arm-deploy@v1.0.8
       with:
         scope: resourcegroup
@@ -44,5 +51,33 @@ jobs:
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
-        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} sqlAdministratorLogin=${{ env.AZ_SQL_SERVER_LOGIN }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }}
+        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} sqlAdministratorLogin=${{ env.AZ_SQL_SERVER_LOGIN }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }} sqlAdministratorAadName=${{ env.AZ_SQL_AAD_ADMIN_NAME }} sqlAdministratorAadClientId=${{ env.AZ_CLIENT_ID }}
         failOnStdErr: false
+
+    - name: Get Managed Identity Client Id
+      id: getClientId
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.38.0
+        inlineScript: |
+          echo "::set-output name=managedIdentityClientId::$(az ad sp show --id $MI_ID --query "appId" --output tsv)"
+      env:
+        MI_ID: ${{ steps.deploy.outputs.apiIdentityPrincipalId }}
+
+    - name: Turn AAD ClientId into a SQL User SID
+      id: getSqlSid
+      shell: pwsh
+      run: |
+        "managedIdentityClientIdAsSid=0x$([System.BitConverter]::ToString([Guid]::Parse("$($env:MI_CLIENTID)").ToByteArray()).Replace('-',''))" >> $env:GITHUB_OUTPUT
+      env:
+        MI_CLIENTID: ${{ steps.getClientId.outputs.managedIdentityClientId}}
+
+    - run: sed -i -e "s/##user##/$AZ_API_NAME/g" -e "s/##mi_sid##/$MI_CLIENTID/g" "./.github/workflows/sql-aad-setup/script.sql"
+      name: 'Replacements into the Sql Script'
+      env:
+        MI_CLIENTID: ${{ steps.getSqlSid.outputs.managedIdentityClientIdAsSid}}
+
+    - uses: azure/sql-action@v2
+      with:        
+        connection-string: 'Server=${{ env.AZ_SQL_SERVER_NAME }}.database.windows.net; Authentication=Active Directory Service Principal; Encrypt=True; Database=${{ env.AZ_SQL_DATABASE_NAME }}; User Id=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}; Password=${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }};'
+        path: './.github/workflows/sql-aad-setup/script.sql'

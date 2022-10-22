@@ -11,10 +11,15 @@ param analyticsName string
 param location string = resourceGroup().location
 
 param serverName string
+//Used so we can setup an AAD login to the database using the Managed Identity of the App Service
 param sqlAdministratorLogin string
 @secure()
 param sqlAdministratorLoginPassword string
 param databaseName string
+@description('Name of the Service Principal that runs deployments')
+param sqlAdministratorAadName string
+@description('ClientId of the Service Principal that runs deployments')
+param sqlAdministratorAadClientId string
 
 var appServicePlanName = toLower(servicePlan)
 var webSiteName = toLower(appName)
@@ -55,7 +60,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   }
 }
 
-resource apiService 'Microsoft.Web/sites@2020-06-01' = {
+resource apiService 'Microsoft.Web/sites@2022-03-01' = {
   name: webApiName
   location: location
   identity: {
@@ -70,6 +75,20 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true
     siteConfig: {
       minTlsVersion: '1.2'
+      netFrameworkVersion: 'v6.0'
+      appSettings: [
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsights.properties.ConnectionString
+        }
+      ]
+      connectionStrings: [
+        {
+          name: 'ContosoUniversityAPIContext'
+          connectionString: 'Server=tcp:${sqlServer.name}${environment().suffixes.sqlServerHostname},1433;Authentication=Active Directory Managed Identity;Database=${sqlDatabase.name}'
+          type: 'SQLAzure'
+        }
+      ]
     }
   }
 }
@@ -196,8 +215,16 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   }
   properties: {
     administratorLogin: sqlAdministratorLogin
-    administratorLoginPassword: sqlAdministratorLoginPassword
+    administratorLoginPassword: sqlAdministratorLoginPassword    
     version: '12.0'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      azureADOnlyAuthentication: false
+      principalType: 'Application'
+      tenantId: subscription().tenantId
+      sid: sqlAdministratorAadClientId
+      login: sqlAdministratorAadName
+    }
   }
 }
 
@@ -230,3 +257,5 @@ resource symbolicname 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' =
     startIpAddress: '0.0.0.0'
   }
 }
+
+output apiIdentityPrincipalId string = apiService.identity.principalId
