@@ -41,7 +41,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   }
 }
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
+resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: webSiteName
   location: location
   identity: {
@@ -56,6 +56,33 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true
     siteConfig: {
       minTlsVersion: '1.2'
+      netFrameworkVersion: 'v6.0'
+      appSettings: [
+        {
+          name: 'Api:Address'
+          value: 'https://${apiService.properties.hostNames[0]}/'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsights.properties.ConnectionString
+        }
+        {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_Mode'
+          value: 'recommended'
+        }
+        {
+          name: 'InstrumentationEngine_EXTENSION_VERSION'
+          value: '~1'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
+          value: '~1'
+        }      
+      ]
     }
   }
 }
@@ -80,6 +107,22 @@ resource apiService 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsights.properties.ConnectionString
+        }
+        {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_Mode'
+          value: 'recommended'
+        }
+        {
+          name: 'InstrumentationEngine_EXTENSION_VERSION'
+          value: '~1'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
+          value: '~1'
         }
       ]
       connectionStrings: [
@@ -139,28 +182,6 @@ resource apiServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
   }
 }
 
-resource appServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: appService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    appServiceSiteExtension
-  ]
-}
-
-resource apiServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: apiService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    apiServiceSiteExtension
-  ]
-}
-
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
   name: logAnalyticsName
   location: location
@@ -188,22 +209,6 @@ resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
   }
-}
-
-resource appServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: appService
-  dependsOn: [
-    appInsights
-  ]
-}
-
-resource apiServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: apiService
-  dependsOn: [
-    appInsights
-  ]
 }
 
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
