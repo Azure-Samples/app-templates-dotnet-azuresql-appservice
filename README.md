@@ -38,8 +38,8 @@ This creates a local copy of the repository for you to work in.
 Run the below az cli command to create a resource group named "rg-ContosoUniversityDemo". Change resourcegroup and location variable as required. If you are changing the resourcegroupname, you must update the resourcegroup name under ContosoUniversity - Infra.yml as well after the az group command is run.
 
 ```
-$resourceGroup='rg-ContosoUniversityDemo'
-$location='eastus'
+resourceGroup='rg-ContosoUniversityDemo'
+location='eastus'
 az login
 az group create --name $resourceGroup --location $location
 ```
