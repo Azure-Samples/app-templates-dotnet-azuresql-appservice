@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using ContosoUniversity.API.Data;
 using ContosoUniversity.API.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace ContosoUniversity.API.Controllers
 {
@@ -15,10 +17,12 @@ namespace ContosoUniversity.API.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly ContosoUniversityAPIContext _context;
+        private IDistributedCache _cache;
 
-        public CoursesController(ContosoUniversityAPIContext context)
+        public CoursesController(ContosoUniversityAPIContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // GET: api/Courses
@@ -27,9 +31,19 @@ namespace ContosoUniversity.API.Controllers
         {
             //teste 01
 
-            var courses = _context.Courses
-                .Include(c => c.Department);
+            List<Course> courses;
 
+            var cachedCourses = _cache.GetString("courses");
+            if (!string.IsNullOrEmpty(cachedCourses))
+            {
+                courses = JsonConvert.DeserializeObject<List<Course>>(cachedCourses);
+            }
+            else
+            {
+                courses = _context.Courses
+                    .Include(c => c.Department).ToList();
+                _cache.SetString("courses", JsonConvert.SerializeObject(courses));
+            }
             //Transform to DTO
             var result = new DTO.CourseStudentResult()
             {
@@ -38,7 +52,8 @@ namespace ContosoUniversity.API.Controllers
                     ID = c.ID,
                     Credits = c.Credits,
                     Title = c.Title,
-                    Department = new DTO.Department() {
+                    Department = new DTO.Department()
+                    {
                         ID = c.Department.ID,
                         Name = c.Department.Name,
                         Budget = c.Department.Budget,

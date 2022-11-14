@@ -59,6 +59,11 @@ namespace ContosoUniversity.API
                     };
                 };
             });
+            // Caching
+            services.AddDistributedRedisCache(options => {
+                options.Configuration = Configuration.GetConnectionString("RedisConnection");
+                options.InstanceName = "master";
+            });
 
             // Configure the Connection String/Instrumentation key in appsettings.json
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
