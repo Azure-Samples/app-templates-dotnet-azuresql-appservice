@@ -1,22 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.API.Data;
-using NJsonSchema;
-using NSwag.AspNetCore;
-using System.Reflection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Azure;
-using Azure.Core.Extensions;
 
 namespace ContosoUniversity.API
 {
@@ -75,7 +63,7 @@ namespace ContosoUniversity.API
                 var username = Configuration["DBUSERNAME"];
                 var password = Configuration["DBPASSWORD"];
 
-                string connStr = String.Format("Data Source={0},{1};Integrated Security=False; User ID={2};Password={3};Database={4}; Connect Timeout=30; Encrypt=False; TrustServerCertificate=True; ApplicationIntent=ReadWrite; MultiSubnetFailover=False", host, port, username, password, db );
+                string connStr = string.Format("Data Source={0},{1};Integrated Security=False; User ID={2};Password={3};Database={4}; Connect Timeout=30; Encrypt=False; TrustServerCertificate=True; ApplicationIntent=ReadWrite; MultiSubnetFailover=False", host, port, username, password, db );
                 services.AddDbContext<ContosoUniversityAPIContext>(options => options.UseSqlServer(connStr));
             }
             else

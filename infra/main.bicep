@@ -16,6 +16,11 @@ param sqlAdministratorLogin string
 param sqlAdministratorLoginPassword string
 param databaseName string
 
+@description('Name of the Service Principal that runs deployments')
+param sqlAdministratorAadName string
+@description('ClientId of the Service Principal that runs deployments')
+param sqlAdministratorAadClientId string
+
 var appServicePlanName = toLower(servicePlan)
 var webSiteName = toLower(appName)
 var webApiName = toLower(apiName)
@@ -36,7 +41,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   }
 }
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
+resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: webSiteName
   location: location
   identity: {
@@ -51,11 +56,38 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true
     siteConfig: {
       minTlsVersion: '1.2'
+      netFrameworkVersion: 'v6.0'
+      appSettings: [
+        {
+          name: 'Api:Address'
+          value: 'https://${apiService.properties.hostNames[0]}/'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsights.properties.ConnectionString
+        }
+        {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_Mode'
+          value: 'recommended'
+        }
+        {
+          name: 'InstrumentationEngine_EXTENSION_VERSION'
+          value: '~1'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
+          value: '~1'
+        }      
+      ]
     }
   }
 }
 
-resource apiService 'Microsoft.Web/sites@2020-06-01' = {
+resource apiService 'Microsoft.Web/sites@2022-03-01' = {
   name: webApiName
   location: location
   identity: {
@@ -70,6 +102,36 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true
     siteConfig: {
       minTlsVersion: '1.2'
+      netFrameworkVersion: 'v6.0'
+      appSettings: [
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsights.properties.ConnectionString
+        }
+        {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_Mode'
+          value: 'recommended'
+        }
+        {
+          name: 'InstrumentationEngine_EXTENSION_VERSION'
+          value: '~1'
+        }
+        {
+          name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
+          value: '~1'
+        }
+      ]
+      connectionStrings: [
+        {
+          name: 'ContosoUniversityAPIContext'
+          connectionString: 'Server=tcp:${sqlServer.name}${environment().suffixes.sqlServerHostname},1433;Authentication=Active Directory Managed Identity;Database=${sqlDatabase.name}'
+          type: 'SQLAzure'
+        }
+      ]
     }
   }
 }
@@ -120,28 +182,6 @@ resource apiServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
   }
 }
 
-resource appServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: appService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    appServiceSiteExtension
-  ]
-}
-
-resource apiServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: apiService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    apiServiceSiteExtension
-  ]
-}
-
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
   name: logAnalyticsName
   location: location
@@ -171,22 +211,6 @@ resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
   }
 }
 
-resource appServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: appService
-  dependsOn: [
-    appInsights
-  ]
-}
-
-resource apiServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: apiService
-  dependsOn: [
-    appInsights
-  ]
-}
-
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: sqlserverName
   location: location
@@ -196,8 +220,16 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   }
   properties: {
     administratorLogin: sqlAdministratorLogin
-    administratorLoginPassword: sqlAdministratorLoginPassword
+    administratorLoginPassword: sqlAdministratorLoginPassword    
     version: '12.0'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      azureADOnlyAuthentication: false
+      principalType: 'Application'
+      tenantId: subscription().tenantId
+      sid: sqlAdministratorAadClientId
+      login: sqlAdministratorAadName
+    }
   }
 }
 
@@ -230,3 +262,5 @@ resource symbolicname 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' =
     startIpAddress: '0.0.0.0'
   }
 }
+
+output apiIdentityPrincipalId string = apiService.identity.principalId

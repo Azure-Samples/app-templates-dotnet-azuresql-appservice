@@ -13,9 +13,12 @@ $sqlAdministratorLogin = 'sqluser'
 $sqlAdministratorLoginPassword = 'P@ssw0rd'
 $databaseName = 'ContosoUniversityDemoDb'
 
+$sqlAdministratorAadName = '<aad-client-name>'
+$sqlAdministratorAadClientId = '<aad-client-id>'
+
 az group create --name $rgName --location $location
 
-az deployment group create --resource-group $rgName --template-file main.bicep --parameters skuName=$skuName skuCapacity=$skuCapacity servicePlan=$servicePlan appName=$appName apiName=$apiName serverName=$serverName sqlAdministratorLogin=$sqlAdministratorLogin sqlAdministratorLoginPassword=$sqlAdministratorLoginPassword databaseName=$databaseName insightName=$insightName analyticsName=$analyticsName
+az deployment group create --resource-group $rgName --template-file main.bicep --parameters skuName=$skuName skuCapacity=$skuCapacity servicePlan=$servicePlan appName=$appName apiName=$apiName serverName=$serverName sqlAdministratorLogin=$sqlAdministratorLogin sqlAdministratorLoginPassword=$sqlAdministratorLoginPassword databaseName=$databaseName insightName=$insightName analyticsName=$analyticsName sqlAdministratorAadName=$sqlAdministratorAadName sqlAdministratorAadClientId=$sqlAdministratorAadClientId
 
 test
 test
