@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "servicePlan": {
+      "value": "contosoasp"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "skuName": {
+      "value": "S1"
+    },
+    "skuCapacity": {
+      "value": 1
+    },
+    "appName": {
+      "value": "testappmi-asp"
+    },
+    "apiName": {
+      "value": "testappmi-api"
+    },
+    "insightName": {
+      "value": "testappmi-ai"
+    },
+    "serverName":{
+      "value":"testappmi-sql"
+    },
+    "databaseName":{
+      "value":"testappmi-db"
+    },
+    "analyticsName":{
+      "value":"testappmi-db"
+    }}
+  }

@@ -44,5 +44,5 @@ jobs:
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
-        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} sqlAdministratorLogin=${{ env.AZ_SQL_SERVER_LOGIN }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }}
+        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }}
         failOnStdErr: false
