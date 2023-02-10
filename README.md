@@ -22,8 +22,11 @@ This sample application is structured in a way to be compatible with [Azure Deve
 This application utilizes the following Azure resources:
 
 Azure App Services to host the Web frontend and API backend
+
 Azure SQL DB for storage
+
 Azure App Insights for monitoring 
+
 Log Analystics for logging
 
 Here's a high level architecture diagram that illustrates these components. Notice that these are all contained within a single resource group, that will be created for you when you create the resources.
@@ -151,7 +154,8 @@ After deployment, below resources will be created
 
 Once successfully deployed, the application is accessible through the webapp appservice endpoint hostname ending in -app.azurewebsites.net. Under your resource group, you can look at the "App Service" resource with "-app" suffixed to its name through the [Azure Portal](https://portal.azure.com) 
 
-![image](https://user-images.githubusercontent.com/61921020/176207819-5571b7d4-2e28-46c3-ba59-b688510448fb.png)
+<img width="497" alt="image" src="https://user-images.githubusercontent.com/61921020/218220729-2dcc60cb-b3b6-47a9-9f62-508d2be83490.png">
+
 
 ## Clean up resources
 When you are done, you can delete all the Azure resources created with this template by running the following command:
