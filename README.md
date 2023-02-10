@@ -17,7 +17,18 @@ This sample application is structured in a way to be compatible with [Azure Deve
 - App Insights
 - Log Analytics
 - Bicep
-- Terraform (coming soon) 
+
+## Application Architecture
+This application utilizes the following Azure resources:
+
+Azure App Services to host the Web frontend and API backend
+Azure SQL DB for storage
+Azure App Insights for monitoring 
+Log Analystics for logging
+
+Here's a high level architecture diagram that illustrates these components. Notice that these are all contained within a single resource group, that will be created for you when you create the resources.
+
+![alt text](https://github.com/Azure-Samples/app-templates-dotnet-azuresql-appservice/blob/main/assets/ASP.NET%20SQL%20app%20template.jpg)
 
 ## Prerequisites
 - Local shell with Azure CLI installed or [Azure Cloud Shell](https://ms.portal.azure.com/#cloudshell/)
