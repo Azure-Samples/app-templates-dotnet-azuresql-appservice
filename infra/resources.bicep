@@ -1,5 +1,6 @@
 param location string
 param resourceToken string
+param tags object
 
 param skuName string = 'S1'
 param skuCapacity int = 1
@@ -18,10 +19,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
     name: skuName
     capacity: skuCapacity
   }
-  tags: {
-    displayName: 'HostingPlan'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
 }
 
 resource appService 'Microsoft.Web/sites@2020-06-01' = {
@@ -30,10 +28,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  tags: {
-    displayName: 'Website'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
@@ -77,10 +72,7 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  tags: {
-    displayName: 'Website'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
@@ -121,10 +113,7 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
   name: 'loganalytics-${resourceToken}'
   location: location
-  tags: {
-    displayName: 'Log Analytics'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
   properties: {
     sku: {
       name: 'PerGB2018'
@@ -137,10 +126,7 @@ resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
   name: 'ai-${resourceToken}'
   location: location
   kind: 'string'
-  tags: {
-    displayName: 'AppInsight'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
@@ -166,10 +152,7 @@ resource apiServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01'
 resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   name: 'sql-${resourceToken}'
   location: location
-  tags: {
-    displayName: 'SQL Server'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
   properties: {
     administratorLogin: sqlAdministratorLogin
     administratorLoginPassword: sqlAdministratorLoginPassword
@@ -178,10 +161,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
   resource sqlDatabase 'databases' = {
     name: databaseName
     location: location
-    tags: {
-      displayName: 'Database'
-      ProjectName: 'ContosoUniversity'
-    }
+    tags: tags
     sku: {
       name: 'Basic'
     }

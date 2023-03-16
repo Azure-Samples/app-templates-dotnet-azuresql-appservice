@@ -31,6 +31,7 @@ module resources 'resources.bicep' = {
   name: 'resources'
   scope: resourceGroup
   params: {
+    tags: tags
     location: location
     resourceToken: resourceToken
     sqlAdministratorLogin: sqlServerUsername
@@ -38,6 +39,5 @@ module resources 'resources.bicep' = {
   }
 }
 
-output AZURE_RESOURCE_GROUP_NAME string = resourceGroup.name
 output AZURE_LOCATION string = location
 
