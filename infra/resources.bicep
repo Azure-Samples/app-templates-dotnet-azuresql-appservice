@@ -41,6 +41,34 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
       minTlsVersion: '1.2'
     }
   }
+  resource appSettings 'config' = {
+    name: 'appsettings'
+    properties: {
+      APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
+    }
+  }
+  resource logs 'config' = {
+    name: 'logs'
+    properties: {
+      applicationLogs: {
+        fileSystem: {
+          level: 'Warning'
+        }
+      }
+      httpLogs: {
+        fileSystem: {
+          retentionInMb: 40
+          enabled: true
+        }
+      }
+      failedRequestsTracing: {
+        enabled: true
+      }
+      detailedErrorMessages: {
+        enabled: true
+      }
+    }
+  }
 }
 
 resource apiService 'Microsoft.Web/sites@2020-06-01' = {
@@ -60,74 +88,34 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
       minTlsVersion: '1.2'
     }
   }
-}
-
-resource appServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
-  name: 'applogs-${resourceToken}'
-  properties: {
-    applicationLogs: {
-      fileSystem: {
-        level: 'Warning'
-      }
+  resource appSettings 'config' = {
+    name: 'appsettings'
+    properties: {
+      APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
     }
-    httpLogs: {
-      fileSystem: {
-        retentionInMb: 40
+  }
+  resource logs 'config' = {
+    name: 'logs'
+    properties: {
+      applicationLogs: {
+        fileSystem: {
+          level: 'Warning'
+        }
+      }
+      httpLogs: {
+        fileSystem: {
+          retentionInMb: 40
+          enabled: true
+        }
+      }
+      failedRequestsTracing: {
+        enabled: true
+      }
+      detailedErrorMessages: {
         enabled: true
       }
     }
-    failedRequestsTracing: {
-      enabled: true
-    }
-    detailedErrorMessages: {
-      enabled: true
-    }
   }
-}
-
-resource apiServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
-  name: 'apilogs-${resourceToken}'
-  properties: {
-    applicationLogs: {
-      fileSystem: {
-        level: 'Warning'
-      }
-    }
-    httpLogs: {
-      fileSystem: {
-        retentionInMb: 40
-        enabled: true
-      }
-    }
-    failedRequestsTracing: {
-      enabled: true
-    }
-    detailedErrorMessages: {
-      enabled: true
-    }
-  }
-}
-
-resource appServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: appService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    appServiceSiteExtension
-  ]
-}
-
-resource apiServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: apiService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    apiServiceSiteExtension
-  ]
 }
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
@@ -187,22 +175,20 @@ resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
     administratorLoginPassword: sqlAdministratorLoginPassword
     version: '12.0'
   }
-}
-
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-02-01-preview' = {
-  parent: sqlServer
-  name: databaseName
-  location: location
-  tags: {
-    displayName: 'Database'
-    ProjectName: 'ContosoUniversity'
-  }
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    maxSizeBytes: 1073741824
+  resource sqlDatabase 'databases' = {
+    name: databaseName
+    location: location
+    tags: {
+      displayName: 'Database'
+      ProjectName: 'ContosoUniversity'
+    }
+    sku: {
+      name: 'Basic'
+    }
+    properties: {
+      collation: 'SQL_Latin1_General_CP1_CI_AS'
+      maxSizeBytes: 1073741824
+    }
   }
 }
 
