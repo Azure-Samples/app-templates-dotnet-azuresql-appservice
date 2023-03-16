@@ -4,7 +4,7 @@ name: app-templates-dotnet-azuresql-appservice
 metadata:
   template: app-templates-dotnet-azuresql-appservice@0.0.1-beta
 services:
-  web:
+  app:
     project: ./src/ContosoUniversity.WebApplication
     language: csharp
     host: appservice

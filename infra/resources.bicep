@@ -28,7 +28,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  tags: tags
+  tags: union(tags, { 'azd-service-name': 'app' })
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
@@ -72,7 +72,7 @@ resource apiService 'Microsoft.Web/sites@2020-06-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  tags: tags
+  tags: union(tags, { 'azd-service-name': 'api' })
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
