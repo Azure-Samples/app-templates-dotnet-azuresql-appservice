@@ -2,7 +2,6 @@ param name string
 param location string = resourceGroup().location
 param tags object = {}
 
-param allowedOrigins array = []
 param appCommandLine string = ''
 param applicationInsightsName string = ''
 param appServicePlanId string
@@ -16,7 +15,7 @@ module api '../core/host/appservice.bicep' = {
     name: name
     location: location
     tags: union(tags, { 'azd-service-name': serviceName })
-    allowedOrigins: allowedOrigins
+    allowAllOrigins: true
     appCommandLine: appCommandLine
     applicationInsightsName: applicationInsightsName
     appServicePlanId: appServicePlanId

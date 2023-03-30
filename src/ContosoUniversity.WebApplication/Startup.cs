@@ -31,8 +31,7 @@ namespace ContosoUniversity.WebApplication
             // this environmet is for docker
             if (Configuration["URLAPI"] != null)
             {
-                var url = Configuration["URLAPI"];
-                services.AddHttpClient("client", client => { client.BaseAddress = new System.Uri(url); });
+                services.AddHttpClient("client", client => { client.BaseAddress = new System.Uri(Configuration["URLAPI"]); });
             }
             else
             {
@@ -41,7 +40,10 @@ namespace ContosoUniversity.WebApplication
             }
 
             services.AddRazorPages();
-            services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
+            if (Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] != null)
+            {
+                services.AddApplicationInsightsTelemetry(Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
