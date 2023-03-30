@@ -1,44 +1,52 @@
-﻿using System;
+﻿using Azure.Identity;
+using System;
 using ContosoUniversity.API.Data;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
-namespace ContosoUniversity.API
+
+var builder = WebApplication.CreateBuilder(args);
+
+var credential = new DefaultAzureCredential();
+builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"]), credential);
+
+builder.Services.AddDbContext<ContosoUniversityAPIContext>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            //CreateWebHostBuilder(args).Build().Run();
+    var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CONNECTION_STRING_KEY"]];
+    options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
+});
 
-            var host = CreateWebHostBuilder(args).Build();
+builder.Services.AddControllers();
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
 
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
+var app = builder.Build();
 
-                try
-                {
-                    var context = services.GetRequiredService<ContosoUniversityAPIContext>();
-                    //context.Database.EnsureCreated();
-
-                    // using ContosoUniversity.Data; 
-                    DbInitializer.Initialize(context);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred creating the DB.");
-                }
-            }
-
-            host.Run();
-        }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-    }
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ContosoUniversityAPIContext>();
+    await DbInitializer.Initialize(db);
 }
+
+//if (env.IsDevelopment())
+//{
+//    app.UseDeveloperExceptionPage();
+//}
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+// Register the Swagger generator and the Swagger UI middlewares
+app.UseOpenApi();
+app.UseSwaggerUi3();
+
+app.Run();

@@ -3,15 +3,16 @@ using ContosoUniversity.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ContosoUniversity.API.Data
 {
     public class DbInitializer
     {
-        public static void Initialize(ContosoUniversityAPIContext context)
+        public async static Task Initialize(ContosoUniversityAPIContext context)
         {
             var random = new Random();
-            context.Database.EnsureCreated();
+            await context.Database.EnsureCreatedAsync();
 
             // Look for any students.
             if (context.Student.Any())
@@ -26,9 +27,9 @@ namespace ContosoUniversity.API.Data
 
             var instructors = instructorFaker.Generate(1000);
 
-            context.Instructors.AddRange(instructors);
+            await context.Instructors.AddRangeAsync(instructors);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             var departments = new Department[]
             {
@@ -38,11 +39,8 @@ namespace ContosoUniversity.API.Data
                 new Department { Name = "Economics", Budget = 100000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors[random.Next(instructors.Count)] }
             };
 
-            foreach (Department d in departments)
-            {
-                context.Departments.Add(d);
-            }
-            context.SaveChanges();
+            await context.Departments.AddRangeAsync(departments);
+            await context.SaveChangesAsync();
 
 
             var courses = new Course[]
@@ -55,11 +53,8 @@ namespace ContosoUniversity.API.Data
                 new Course {Title = "Literature", Credits = 4, Department = departments.Single( s => s.Name == "English") },
             };
 
-            foreach (Course c in courses)
-            {
-                context.Courses.Add(c);
-            }
-            context.SaveChanges();
+            await context.Courses.AddRangeAsync(courses);
+            await context.SaveChangesAsync();
 
             var studentFaker = new Faker<Student>()
                 .RuleFor(s => s.FirstName, f => f.Name.FirstName())
@@ -68,8 +63,8 @@ namespace ContosoUniversity.API.Data
 
             var students = studentFaker.Generate(10000);
 
-            context.Student.AddRange(students);
-            context.SaveChanges();
+            await context.Student.AddRangeAsync(students);
+            await context.SaveChangesAsync();
 
             var studentCourse = new List<StudentCourse>();
 
@@ -83,9 +78,9 @@ namespace ContosoUniversity.API.Data
                     });
             }
 
-            context.StudentCourse.AddRange(studentCourse);
+            await context.StudentCourse.AddRangeAsync(studentCourse);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
     }
