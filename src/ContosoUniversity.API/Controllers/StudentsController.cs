@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ContosoUniversity.API.Data;
-using ContosoUniversity.API.Models;
 using System;
 using Microsoft.EntityFrameworkCore;
 
