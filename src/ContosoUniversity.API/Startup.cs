@@ -18,6 +18,25 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Azure;
 using Azure.Core.Extensions;
 
+// using Azure.Identity;
+// using Microsoft.EntityFrameworkCore;
+// using SimpleTodo.Api;
+
+// var builder = WebApplication.CreateBuilder(args);
+// var credential = new DefaultAzureCredential();
+// builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"]), credential);
+
+// builder.Services.AddScoped<ListsRepository>();
+// builder.Services.AddDbContext<TodoDb>(options =>
+// {
+//     var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CONNECTION_STRING_KEY"]];
+//     options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
+// });
+
+// builder.Services.AddControllers();
+// builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+
+
 namespace ContosoUniversity.API
 {
     public class Startup
@@ -66,17 +85,9 @@ namespace ContosoUniversity.API
 
         public virtual void ConfigureDatabase(IServiceCollection services)
         {
-            if (Configuration["DBHOST"] != null)
+            if (Configuration["AZURE_SQL_CONNECTION_STRING_KEY"] != null)
             {
-                //https://hk.saowen.com/a/c28ce380a9ef33bdacd04a1a6c1f8ca396b7caa5c5bd7ee1445bce0d609b64d5
-                var host = Configuration["DBHOST"];
-                var db = Configuration["DBNAME"];
-                var port = Configuration["DBPORT"];
-                var username = Configuration["DBUSERNAME"];
-                var password = Configuration["DBPASSWORD"];
-
-                string connStr = String.Format("Data Source={0},{1};Integrated Security=False; User ID={2};Password={3};Database={4}; Connect Timeout=30; Encrypt=False; TrustServerCertificate=True; ApplicationIntent=ReadWrite; MultiSubnetFailover=False", host, port, username, password, db );
-                services.AddDbContext<ContosoUniversityAPIContext>(options => options.UseSqlServer(connStr));
+                services.AddDbContext<ContosoUniversityAPIContext>(options => options.UseSqlServer(Configuration["AZURE_SQL_CONNECTION_STRING_KEY"]));
             }
             else
             {
