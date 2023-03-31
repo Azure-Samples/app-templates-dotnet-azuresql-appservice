@@ -23,11 +23,11 @@ namespace ContosoUniversity.WebApplication.Pages.Students
 
         public Models.APIViewModels.StudentResult Student { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id, string SearchString)
+        public async Task<IActionResult> OnGetAsync(int? id, string SearchString, int? PageNumber)
         {
             if (string.IsNullOrEmpty(SearchString))
             {
-                var response = await client.CreateClient("client").GetStringAsync("api/Students");
+                var response = await client.CreateClient("client").GetStringAsync("api/Students?page=" + (PageNumber ?? 1).ToString());
                 Student = JsonConvert.DeserializeObject<Models.APIViewModels.StudentResult>(response);
             }
             else

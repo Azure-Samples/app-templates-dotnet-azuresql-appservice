@@ -25,6 +25,13 @@
 
 @if (Model.Student.Count > 0)
 {
+    <div>
+        @(Model.Student.Count) results. Page @(Model.Student.CurrentPage) of @(Model.Student.Pages) 
+        @if (Model.Student.CurrentPage > 1) { 
+            <a asp-page="./Index" asp-route-PageNumber="@(Model.Student.CurrentPage - 1)">Previous</a> 
+        } 
+        <a asp-page="./Index" asp-route-PageNumber="@(Model.Student.CurrentPage + 1)">Next</a>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -55,6 +62,7 @@
                 </tr>
             }
         </tbody>
+
     </table>
 
 }

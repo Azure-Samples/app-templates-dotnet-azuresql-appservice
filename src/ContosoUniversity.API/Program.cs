@@ -17,7 +17,7 @@ if (builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"] != null)
 }
 else
 {
-    connectionString = builder.Configuration["ConnectionStrings:ContosoUniversityAPIContext"];
+    connectionString = builder.Configuration.GetConnectionString("ContosoUniversityAPIContext");
 }
 
 builder.Services.AddDbContext<ContosoUniversityAPIContext>(options =>

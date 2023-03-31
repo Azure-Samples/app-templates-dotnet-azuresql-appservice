@@ -27,6 +27,9 @@ builder.Services.AddRazorPages();
 if (builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] != null)
 {
     builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+} else
+{
+    builder.Services.AddApplicationInsightsTelemetry();
 }
 
 var app = builder.Build();
@@ -52,3 +55,5 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapRazorPages();
 });
+
+app.Run();
