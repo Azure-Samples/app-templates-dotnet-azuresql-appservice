@@ -40,7 +40,8 @@ namespace ContosoUniversity.API.Controllers
                         ID = c.Course.ID,
                         Title = c.Course.Title,
                         Credits = c.Course.Credits
-                    }).ToList()
+                    }).ToList(),
+                    EnrollmentDate = s.EnrollmentDate
                 }).ToList()
             };
 
@@ -82,7 +83,8 @@ namespace ContosoUniversity.API.Controllers
                         ID = c.Course.ID,
                         Title = c.Course.Title,
                         Credits = c.Course.Credits
-                    }).ToList()
+                    }).ToList(),
+                    EnrollmentDate = s.EnrollmentDate
                 }).ToList()
             };
 
@@ -120,7 +122,8 @@ namespace ContosoUniversity.API.Controllers
                     ID = c.Course.ID,
                     Title = c.Course.Title,
                     Credits = c.Course.Credits
-                }).ToList()
+                }).ToList(),
+                EnrollmentDate = student.EnrollmentDate
             };
 
             return Ok(result);

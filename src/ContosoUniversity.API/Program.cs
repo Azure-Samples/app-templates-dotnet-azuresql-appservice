@@ -8,13 +8,20 @@ using Microsoft.Extensions.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-var credential = new DefaultAzureCredential();
-builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"]), credential);
+var connectionString = "";
+if (builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"] != null)
+{
+    var credential = new DefaultAzureCredential();
+    builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"]), credential);
+    connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CONNECTION_STRING_KEY"]];
+}
+else
+{
+    connectionString = builder.Configuration["ConnectionStrings:ContosoUniversityAPIContext"];
+}
 
 builder.Services.AddDbContext<ContosoUniversityAPIContext>(options =>
 {
-    var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CONNECTION_STRING_KEY"]];
     options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
 });
 
