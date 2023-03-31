@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,7 +15,7 @@ namespace ContosoUniversity.WebApplication.Pages.Instructors
         }
 
         public Models.APIViewModels.InstructorResult Instructor { get; set; }
-        
+
         public async Task OnGetAsync(int? id, int? courseID)
         {
             var response = await client.CreateClient("client").GetStringAsync("api/Instructors");

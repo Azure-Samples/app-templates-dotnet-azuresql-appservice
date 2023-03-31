@@ -31,7 +31,7 @@ namespace ContosoUniversity.WebApplication.Pages.Instructors
             {
                 return NotFound();
             }
-            
+
             return Page();
         }
     }

@@ -35,7 +35,7 @@ namespace ContosoUniversity.WebApplication.Pages.Courses
             {
                 return Page();
             }
-            
+
             var response = await client.CreateClient("client").PostAsync("api/Courses", new StringContent(JsonConvert.SerializeObject(Course), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)

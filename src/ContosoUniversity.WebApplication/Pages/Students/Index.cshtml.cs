@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http;
 using Newtonsoft.Json;
-using Microsoft.ApplicationInsights;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ContosoUniversity.WebApplication.Pages.Students
 {
@@ -14,14 +14,14 @@ namespace ContosoUniversity.WebApplication.Pages.Students
         private TelemetryClient telemetry;
 
         public string CurrentFilter { get; set; }
-        
+
         public IndexModel(IHttpClientFactory client, TelemetryClient telemetry)
         {
             this.client = client;
             this.telemetry = telemetry;
         }
 
-        public Models.APIViewModels.StudentResult Student { get;set; }
+        public Models.APIViewModels.StudentResult Student { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id, string SearchString)
         {
