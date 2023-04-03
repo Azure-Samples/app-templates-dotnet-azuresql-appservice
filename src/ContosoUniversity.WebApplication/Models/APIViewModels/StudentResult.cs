@@ -2,13 +2,9 @@
 
 namespace ContosoUniversity.WebApplication.Models.APIViewModels
 {
-    public class StudentResult
+    public class StudentResult : PageableResult
     {
-        public int Count { get; set; }
 
-        public int Pages { get; set; }
-
-        public int CurrentPage { get; set; }
         public List<Student> Students { get; set; }
     }
 }

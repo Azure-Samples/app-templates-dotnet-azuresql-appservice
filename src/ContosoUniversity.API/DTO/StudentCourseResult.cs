@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace ContosoUniversity.API.DTO
 {
-    public class StudentCourseResult
+    public class StudentCourseResult : PageableResult
     {
-        public int Pages { get; set; }
-
-        public int CurrentPage { get; set; }
-        public int Count { get; set; }
         public IList<Student> Students { get; set; }
 
         public StudentCourseResult()

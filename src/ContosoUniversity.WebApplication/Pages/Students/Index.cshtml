@@ -30,7 +30,9 @@
         @if (Model.Student.CurrentPage > 1) { 
             <a asp-page="./Index" asp-route-PageNumber="@(Model.Student.CurrentPage - 1)">Previous</a> 
         } 
-        <a asp-page="./Index" asp-route-PageNumber="@(Model.Student.CurrentPage + 1)">Next</a>
+        @if (Model.Student.CurrentPage < Model.Student.Pages) {
+            <a asp-page="./Index" asp-route-PageNumber="@(Model.Student.CurrentPage + 1)">Next</a>
+        }
     </div>
     <table class="table">
         <thead>

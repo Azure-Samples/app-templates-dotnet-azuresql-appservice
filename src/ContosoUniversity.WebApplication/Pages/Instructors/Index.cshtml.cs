@@ -16,9 +16,9 @@ namespace ContosoUniversity.WebApplication.Pages.Instructors
 
         public Models.APIViewModels.InstructorResult Instructor { get; set; }
 
-        public async Task OnGetAsync(int? id, int? courseID)
+        public async Task OnGetAsync(int? id, int? courseID, int? PageNumber)
         {
-            var response = await client.CreateClient("client").GetStringAsync("api/Instructors");
+            var response = await client.CreateClient("client").GetStringAsync("api/Instructors?page=" + (PageNumber ?? 1).ToString());
             Instructor = JsonConvert.DeserializeObject<Models.APIViewModels.InstructorResult>(response);
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ContosoUniversity.API.Data;
 using ContosoUniversity.API.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ContosoUniversity.API.Controllers
 {
@@ -20,20 +21,30 @@ namespace ContosoUniversity.API.Controllers
 
         // GET: api/Instructors
         [HttpGet]
-        public IActionResult GetInstructors()
+        public async Task<IActionResult> GetInstructors(int? page)
         {
             var instructors = _context.Instructors;
+
+            int pageNumber = page.HasValue && page.Value > 0 ? page.Value - 1 : 0; // 0-index
+            int pageSize = 50;
+
+            int totalInstructors = await instructors.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalInstructors / pageSize);
 
             //Transform to DTO
             var result = new DTO.InstructorResult()
             {
-                Instructors = instructors.Select(c => new DTO.Instructor()
+                Instructors = await instructors.OrderBy(s => s.ID).Skip(pageNumber * pageSize).Take(pageSize).
+                Select(c => new DTO.Instructor()
                 {
                     ID = c.ID,
                     FirstName = c.FirstName,
                     LastName = c.LastName,
                     HireDate = c.HireDate
-                }).ToList()
+                }).ToListAsync(),
+                Count = totalInstructors,
+                Pages = totalPages,
+                CurrentPage = pageNumber + 1
             };
 
             return Ok(result);
