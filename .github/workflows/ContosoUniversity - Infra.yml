@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   
 env:
-  AZ_RG_NAME: 'rg-csu44c'
+  AZ_RG_NAME: ${{secrets.AZ_RG_NAME}}
   AZ_LOCATION: 'eastus'
   AZ_SERVICE_PLAN: ${{secrets.AZURE_APP_NAME}}-asp
   AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
