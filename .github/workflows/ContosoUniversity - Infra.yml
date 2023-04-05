@@ -42,5 +42,5 @@ jobs:
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
-        parameters: resourceGroupName=${{ env.AZ_RG_NAME }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} 
+        parameters: environmentName=${{secrets.AZURE_APP_NAME}} resourceGroupName=${{ env.AZ_RG_NAME }} location=${{ env.AZ_LOCATION }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} 
         failOnStdErr: false
