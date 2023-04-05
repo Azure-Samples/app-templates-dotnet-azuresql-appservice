@@ -39,6 +39,8 @@ jobs:
     - name: Deploy Template
       uses: Azure/arm-deploy@v1.0.8
       with:
+        scope: subscription
+        location: $ {{ env.AZ_LOCATION }}
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
