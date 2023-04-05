@@ -143,6 +143,15 @@ module monitoring './core/monitor/monitoring.bicep' = {
   }
 }
 
+module loadtest './app/loadtest.bicep' = {
+  name: 'loadtest'
+  scope: rg
+  params: {
+    name: 'loadtest-${resourceToken}'
+    location: location
+  }
+}
+
 // Data outputs
 output AZURE_SQL_CONNECTION_STRING_KEY string = sqlServer.outputs.connectionStringKey
 
@@ -152,3 +161,5 @@ output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
 output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_LOAD_TEST_NAME string = loadtest.name
+output AZURE_LOAD_TEST_HOST string = web.outputs.SERVICE_WEB_HOSTNAME

@@ -26,3 +26,4 @@ module web '../core/host/appservice.bicep' = {
 output SERVICE_WEB_IDENTITY_PRINCIPAL_ID string = web.outputs.identityPrincipalId
 output SERVICE_WEB_NAME string = web.outputs.name
 output SERVICE_WEB_URI string = web.outputs.uri
+output SERVICE_WEB_HOSTNAME string = web.outputs.hostname
