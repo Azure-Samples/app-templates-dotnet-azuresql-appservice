@@ -19,7 +19,7 @@ module web '../core/host/appservice.bicep' = {
     runtimeName: 'dotnetcore'
     runtimeVersion: '6.0'
     tags: union(tags, { 'azd-service-name': serviceName })
-    scmDoBuildDuringDeployment: true
+    scmDoBuildDuringDeployment: false
   }
 }
 
