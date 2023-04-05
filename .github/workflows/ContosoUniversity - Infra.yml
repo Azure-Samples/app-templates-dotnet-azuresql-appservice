@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   
 env:
-  AZ_RG_NAME: ${{secrets.AZ_RG_NAME}}
+  AZ_RG_NAME: 'rg-csu44d'
   AZ_LOCATION: 'eastus'
   AZ_SERVICE_PLAN: ${{secrets.AZURE_APP_NAME}}-asp
   AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
@@ -39,10 +39,8 @@ jobs:
     - name: Deploy Template
       uses: Azure/arm-deploy@v1.0.8
       with:
-        scope: resourcegroup
-        resourceGroupName: ${{ env.AZ_RG_NAME }}
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
-        parameters: servicePlan=${{ env.AZ_SERVICE_PLAN }} appName=${{ env.AZ_APP_NAME }} apiName=${{ env.AZ_API_NAME }} insightName=${{ env.AZ_INSIGHT_NAME }} analyticsName=${{ env.AZ_ANALYTICS_NAME }} serverName=${{ env.AZ_SQL_SERVER_NAME }} sqlAdministratorLogin=${{ env.AZ_SQL_SERVER_LOGIN }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} databaseName=${{ env.AZ_SQL_DATABASE_NAME }}
+        parameters: resourceGroupName=${{ env.AZ_RG_NAME }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} 
         failOnStdErr: false
