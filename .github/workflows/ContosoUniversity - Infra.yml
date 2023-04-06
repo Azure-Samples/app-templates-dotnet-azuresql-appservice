@@ -43,7 +43,7 @@ jobs:
       with:
         scope: subscription
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        location: ${{ env.AZ_LOCATION }}
+        region: ${{ env.AZ_LOCATION }}
         resourceGroupName: ${{ env.AZ_RG_NAME }}
         template: infra/main.bicep
         deploymentMode: Incremental
