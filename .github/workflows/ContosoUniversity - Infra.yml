@@ -36,6 +36,8 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
+    - run: echo ${{ env.AZ_RG_NAME }}
+
     - name: Deploy Template
       uses: Azure/arm-deploy@v1.0.8
       with:
