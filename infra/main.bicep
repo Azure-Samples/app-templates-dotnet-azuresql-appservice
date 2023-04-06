@@ -2,7 +2,7 @@
 targetScope = 'subscription'
 
 param environmentName string
-param resourceGroupName string = ''
+param resourceGroupName string
 param location string 
 
 @secure()
