@@ -42,7 +42,6 @@ jobs:
       uses: Azure/arm-deploy@v1.0.8
       with:
         scope: subscription
-        scope: subscription
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         region: ${{ env.AZ_LOCATION }}
         resourceGroupName: ${{ env.AZ_RG_NAME }}
