@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ContosoUniversity.API.Data;
-using ContosoUniversity.API.Models;
 using System;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,28 +20,40 @@ namespace ContosoUniversity.API.Controllers
 
         // GET: api/Students
         [HttpGet]
-        public IActionResult GetStudent()
+        public async Task<IActionResult> GetStudent(int? page)
         {
             var students = _context.Student
                 .Include(s => s.StudentCourse)
                 .ThenInclude(s => s.Course)
                 .AsNoTracking();
 
+            int pageNumber = page.HasValue && page.Value > 0 ? page.Value - 1 : 0; // 0-index
+            int pageSize = 50;
+
+            int totalStudents = await students.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalStudents / pageSize);
+
             //Transform to DTO
             var result = new DTO.StudentCourseResult()
             {
-                Students = students.Select(s => new DTO.Student()
-                {
-                    ID = s.ID,
-                    FirstName = s.FirstName,
-                    LastName = s.LastName,
-                    Courses = s.StudentCourse.Select(c => new DTO.Course()
+                Students = await students.OrderBy(s => s.ID).Skip(pageNumber * pageSize).Take(pageSize).
+                Select(s => new DTO.Student()
                     {
-                        ID = c.Course.ID,
-                        Title = c.Course.Title,
-                        Credits = c.Course.Credits
-                    }).ToList()
-                }).ToList()
+                        ID = s.ID,
+                        FirstName = s.FirstName,
+                        LastName = s.LastName,
+                        Courses = s.StudentCourse.Select(c => new DTO.Course()
+                        {
+                            ID = c.Course.ID,
+                            Title = c.Course.Title,
+                            Credits = c.Course.Credits
+                        }).ToList(),
+                        EnrollmentDate = s.EnrollmentDate
+                    }).
+                ToListAsync(),
+                Count = totalStudents,
+                Pages = totalPages,
+                CurrentPage = pageNumber + 1
             };
 
             return Ok(result);
@@ -84,7 +94,8 @@ namespace ContosoUniversity.API.Controllers
                         ID = c.Course.ID,
                         Title = c.Course.Title,
                         Credits = c.Course.Credits
-                    }).ToList()
+                    }).ToList(),
+                    EnrollmentDate = s.EnrollmentDate
                 }).ToList()
             };
 
@@ -122,7 +133,8 @@ namespace ContosoUniversity.API.Controllers
                     ID = c.Course.ID,
                     Title = c.Course.Title,
                     Credits = c.Course.Credits
-                }).ToList()
+                }).ToList(),
+                EnrollmentDate = student.EnrollmentDate
             };
 
             return Ok(result);

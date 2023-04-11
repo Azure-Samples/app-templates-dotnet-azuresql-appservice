@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+﻿using System.Collections.Generic;
 namespace ContosoUniversity.API.DTO
 {
-    public class InstructorResult
+    public class InstructorResult : PageableResult
     {
-        public int Count => Instructors.Count();
         public IList<Instructor> Instructors { get; set; }
 
         public InstructorResult()

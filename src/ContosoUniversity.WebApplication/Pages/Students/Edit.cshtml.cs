@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +45,7 @@ namespace ContosoUniversity.WebApplication.Pages.Students
             {
                 return Page();
             }
-    
+
             var response = await client.CreateClient("client").PutAsync("api/Students/" + Student.Id, new StringContent(JsonConvert.SerializeObject(Student), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)

@@ -10,7 +10,7 @@ namespace ContosoUniversity.WebApplication.Pages.Courses
         private readonly IHttpClientFactory client;
 
         public IndexModel(IHttpClientFactory client)
-        { 
+        {
             this.client = client;
         }
 

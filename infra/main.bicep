@@ -1,247 +1,165 @@
-// teste https://github.com/Azure/azure-quickstart-templates/blob/master/quickstarts/microsoft.web/web-app-loganalytics/main.bicep
+targetScope = 'subscription'
 
-param skuName string = 'S1'
-param skuCapacity int = 1
-param servicePlan string
+@minLength(1)
+@maxLength(64)
+@description('Name of the the environment which is used to generate a short unique hash used in all resources.')
+param environmentName string
 
-param appName string
-param apiName string
-param insightName string
-param analyticsName string
-param location string = resourceGroup().location
+@minLength(1)
+@description('Primary location for all resources')
+param location string
 
-param serverName string
-param sqlAdministratorLogin string
+// Optional parameters to override the default azd resource naming conventions. Update the main.parameters.json file to provide values. e.g.,:
+// "resourceGroupName": {
+//      "value": "myGroupName"
+// }
+param apiServiceName string = ''
+param applicationInsightsDashboardName string = ''
+param applicationInsightsName string = ''
+param appServicePlanName string = ''
+param keyVaultName string = ''
+param logAnalyticsName string = ''
+param resourceGroupName string = ''
+param sqlServerName string = ''
+param sqlDatabaseName string = ''
+param webServiceName string = ''
+
+@description('Id of the user or app to assign application roles')
+param principalId string = ''
+
 @secure()
-param sqlAdministratorLoginPassword string
-param databaseName string
+@description('SQL Server administrator password')
+param sqlAdminPassword string
 
-var appServicePlanName = toLower(servicePlan)
-var webSiteName = toLower(appName)
-var webApiName = toLower(apiName)
-var appInsightName = toLower(insightName)
-var logAnalyticsName = toLower(analyticsName)
-var sqlserverName = toLower(serverName)
+@secure()
+@description('Application user password')
+param appUserPassword string
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
-  name: appServicePlanName
+var abbrs = loadJsonContent('./abbreviations.json')
+var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
+var tags = { 'azd-env-name': environmentName }
+
+// Organize resources in a resource group
+resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
   location: location
-  sku: {
-    name: skuName
-    capacity: skuCapacity
-  }
-  tags: {
-    displayName: 'HostingPlan'
-    ProjectName: 'ContosoUniversity'
-  }
+  tags: tags
 }
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
-  name: webSiteName
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  tags: {
-    displayName: 'Website'
-    ProjectName: 'ContosoUniversity'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    siteConfig: {
-      minTlsVersion: '1.2'
+// The application frontend
+module web './app/web.bicep' = {
+  name: 'web'
+  scope: rg
+  params: {
+    name: !empty(webServiceName) ? webServiceName : '${abbrs.webSitesAppService}web-${resourceToken}'
+    location: location
+    tags: tags
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    appServicePlanId: appServicePlan.outputs.id
+    appSettings: {
+      URLAPI: api.outputs.SERVICE_API_URI
     }
   }
 }
 
-resource apiService 'Microsoft.Web/sites@2020-06-01' = {
-  name: webApiName
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  tags: {
-    displayName: 'Website'
-    ProjectName: 'ContosoUniversity'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    siteConfig: {
-      minTlsVersion: '1.2'
+// The application backend
+module api './app/api.bicep' = {
+  name: 'api'
+  scope: rg
+  params: {
+    name: !empty(apiServiceName) ? apiServiceName : '${abbrs.webSitesAppService}api-${resourceToken}'
+    location: location
+    tags: tags
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    appServicePlanId: appServicePlan.outputs.id
+    keyVaultName: keyVault.outputs.name
+    appSettings: {
+      AZURE_SQL_CONNECTION_STRING_KEY: sqlServer.outputs.connectionStringKey
     }
   }
 }
 
-resource appServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
-  name: '${appService.name}/logs'
-  properties: {
-    applicationLogs: {
-      fileSystem: {
-        level: 'Warning'
-      }
-    }
-    httpLogs: {
-      fileSystem: {
-        retentionInMb: 40
-        enabled: true
-      }
-    }
-    failedRequestsTracing: {
-      enabled: true
-    }
-    detailedErrorMessages: {
-      enabled: true
-    }
+// Give the API access to KeyVault
+module apiKeyVaultAccess './core/security/keyvault-access.bicep' = {
+  name: 'api-keyvault-access'
+  scope: rg
+  params: {
+    keyVaultName: keyVault.outputs.name
+    principalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
   }
 }
 
-resource apiServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
-  name: '${apiService.name}/logs'
-  properties: {
-    applicationLogs: {
-      fileSystem: {
-        level: 'Warning'
-      }
-    }
-    httpLogs: {
-      fileSystem: {
-        retentionInMb: 40
-        enabled: true
-      }
-    }
-    failedRequestsTracing: {
-      enabled: true
-    }
-    detailedErrorMessages: {
-      enabled: true
-    }
+// The application database
+module sqlServer './app/db.bicep' = {
+  name: 'sql'
+  scope: rg
+  params: {
+    name: !empty(sqlServerName) ? sqlServerName : '${abbrs.sqlServers}${resourceToken}'
+    databaseName: sqlDatabaseName
+    location: location
+    tags: tags
+    sqlAdminPassword: sqlAdminPassword
+    appUserPassword: appUserPassword
+    keyVaultName: keyVault.outputs.name
   }
 }
 
-resource appServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: appService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    appServiceSiteExtension
-  ]
-}
-
-resource apiServiceAppSettings 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: 'appsettings'
-  parent: apiService
-  properties: {
-    APPINSIGHTS_INSTRUMENTATIONKEY: appInsights.properties.InstrumentationKey
-  }
-  dependsOn: [
-    apiServiceSiteExtension
-  ]
-}
-
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
-  name: logAnalyticsName
-  location: location
-  tags: {
-    displayName: 'Log Analytics'
-    ProjectName: 'ContosoUniversity'
-  }
-  properties: {
+// Create an App Service Plan to group applications under the same payment plan and SKU
+module appServicePlan './core/host/appserviceplan.bicep' = {
+  name: 'appserviceplan'
+  scope: rg
+  params: {
+    name: !empty(appServicePlanName) ? appServicePlanName : '${abbrs.webServerFarms}${resourceToken}'
+    location: location
+    tags: tags
     sku: {
-      name: 'PerGB2018'
-    }
-    retentionInDays: 120
-  }
-}
-
-resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
-  name: appInsightName
-  location: location
-  kind: 'string'
-  tags: {
-    displayName: 'AppInsight'
-    ProjectName: 'ContosoUniversity'
-  }
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: logAnalyticsWorkspace.id
-  }
-}
-
-resource appServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: appService
-  dependsOn: [
-    appInsights
-  ]
-}
-
-resource apiServiceSiteExtension 'Microsoft.Web/sites/siteextensions@2021-03-01' = {
-  name: 'Microsoft.ApplicationInsights.AzureWebSites'
-  parent: apiService
-  dependsOn: [
-    appInsights
-  ]
-}
-
-resource sqlServer 'Microsoft.Sql/servers@2021-02-01-preview' = {
-  name: sqlserverName
-  location: location
-  tags: {
-    displayName: 'SQL Server'
-    ProjectName: 'ContosoUniversity'
-  }
-  properties: {
-    administratorLogin: sqlAdministratorLogin
-    administratorLoginPassword: sqlAdministratorLoginPassword
-    version: '12.0'
-  }
-}
-
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-02-01-preview' = {
-  parent: sqlServer
-  name: databaseName
-  location: location
-  tags: {
-    displayName: 'Database'
-    ProjectName: 'ContosoUniversity'
-  }
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    maxSizeBytes: 1073741824
-  }
-}
-
-// To allow applications hosted inside Azure to connect to your SQL server, Azure connections must be enabled. 
-// To enable Azure connections, there must be a firewall rule with starting and ending IP addresses set to 0.0.0.0. 
-// This recommended rule is only applicable to Azure SQL Database.
-// Ref: https://docs.microsoft.com/en-us/azure/azure-sql/database/firewall-configure?view=azuresql#connections-from-inside-azure
-resource symbolicname 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
-  name: 'AllowAllWindowsAzureIps'
-  parent: sqlServer
-  properties: {
-    endIpAddress: '0.0.0.0'
-    startIpAddress: '0.0.0.0'
-  }
-}
-//  Telemetry Deployment
-@description('Enable usage and telemetry feedback to Microsoft.')
-param enableTelemetry bool = true
-var telemetryId = '69ef933a-eff0-450b-8a46-331cf62e160f-NETWEB-${location}'
-resource telemetrydeployment 'Microsoft.Resources/deployments@2021-04-01' = if (enableTelemetry) {
-  name: telemetryId
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
-      contentVersion: '1.0.0.0'
-      resources: {}
+      name: 'B2'
     }
   }
 }
+
+// Store secrets in a keyvault
+module keyVault './core/security/keyvault.bicep' = {
+  name: 'keyvault'
+  scope: rg
+  params: {
+    name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
+    location: location
+    tags: tags
+    principalId: principalId
+  }
+}
+
+// Monitor application with Azure Monitor
+module monitoring './core/monitor/monitoring.bicep' = {
+  name: 'monitoring'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
+    logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
+    applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
+    applicationInsightsDashboardName: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
+  }
+}
+
+module loadtest './app/loadtest.bicep' = {
+  name: 'loadtest'
+  scope: rg
+  params: {
+    name: 'loadtest-${resourceToken}'
+    location: location
+  }
+}
+
+// Data outputs
+output AZURE_SQL_CONNECTION_STRING_KEY string = sqlServer.outputs.connectionStringKey
+
+// App outputs
+output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
+output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
+output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
+output AZURE_LOCATION string = location
+output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_LOAD_TEST_NAME string = loadtest.name
+output AZURE_LOAD_TEST_HOST string = web.outputs.SERVICE_WEB_HOSTNAME
