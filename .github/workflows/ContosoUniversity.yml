@@ -18,8 +18,8 @@ on:
   
 env:
   CONFIGURATION: release
-  AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
-  AZ_API_NAME: ${{ secrets.AZURE_APP_NAME }}-api
+  AZ_APP_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-app
+  AZ_API_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-api
 
 jobs:
   build:
