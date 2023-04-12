@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ContosoUniversity.API.Models;
+﻿using ContosoUniversity.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.API.Data

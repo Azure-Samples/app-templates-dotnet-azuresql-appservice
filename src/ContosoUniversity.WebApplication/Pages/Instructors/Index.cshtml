@@ -13,7 +13,15 @@
 
 @if (Model.Instructor.Instructors.Count() > 0)
 {
-
+    <div>
+        @(Model.Instructor.Count) results. Page @(Model.Instructor.CurrentPage) of @(Model.Instructor.Pages) 
+        @if (Model.Instructor.CurrentPage > 1) { 
+            <a asp-page="./Index" asp-route-PageNumber="@(Model.Instructor.CurrentPage - 1)">Previous</a> 
+        } 
+        @if (Model.Instructor.CurrentPage < Model.Instructor.Pages) {
+            <a asp-page="./Index" asp-route-PageNumber="@(Model.Instructor.CurrentPage + 1)">Next</a>
+        }
+    </div>
     <table class="table">
         <thead>
             <tr>

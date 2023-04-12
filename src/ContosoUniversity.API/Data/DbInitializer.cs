@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.API.Models;
+﻿using Bogus;
+using ContosoUniversity.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,10 @@ namespace ContosoUniversity.API.Data
 {
     public class DbInitializer
     {
-        public static void Initialize(ContosoUniversityAPIContext context)
+        public async static Task Initialize(ContosoUniversityAPIContext context)
         {
-            context.Database.EnsureCreated();
+            var random = new Random();
+            await context.Database.EnsureCreatedAsync();
 
             // Look for any students.
             if (context.Student.Any())
@@ -18,34 +20,27 @@ namespace ContosoUniversity.API.Data
                 return;   // DB has been seeded
             }
 
-            var instructors = new Instructor[]
-            {
-                new Instructor { FirstName = "Kim", LastName = "Abercrombie", HireDate = DateTime.Parse("11/03/1995") },
-                new Instructor { FirstName = "Fadi", LastName = "Fakhouri", HireDate = DateTime.Parse("06/07/2002") },
-                new Instructor { FirstName = "Roger", LastName = "Harui", HireDate = DateTime.Parse("01/07/1998") },
-                new Instructor { FirstName = "Candace", LastName = "Kapoor", HireDate = DateTime.Parse("01/07/1998") },
-                new Instructor { FirstName = "Roger", LastName = "Zheng", HireDate = DateTime.Parse("12/02/2004") }
-            };
+            var instructorFaker = new Faker<Instructor>()
+                .RuleFor(i => i.FirstName, f => f.Name.FirstName())
+                .RuleFor(i => i.LastName, f => f.Name.LastName())
+                .RuleFor(i => i.HireDate, f => f.Date.Past());
 
-            foreach (Instructor i in instructors)
-            {
-                context.Instructors.Add(i);
-            }
-            context.SaveChanges();
+            var instructors = instructorFaker.Generate(1000);
+
+            await context.Instructors.AddRangeAsync(instructors);
+
+            await context.SaveChangesAsync();
 
             var departments = new Department[]
             {
-                new Department { Name = "English", Budget = 350000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors.Single( i => i.LastName == "Abercrombie") },
-                new Department { Name = "Mathematics", Budget = 100000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors.Single( i => i.LastName == "Fakhouri") },
-                new Department { Name = "Engineering", Budget = 350000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors.Single( i => i.LastName == "Harui") },
-                new Department { Name = "Economics", Budget = 100000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors.Single( i => i.LastName == "Kapoor") }
+                new Department { Name = "English", Budget = 350000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors[random.Next(instructors.Count)] },
+                new Department { Name = "Mathematics", Budget = 100000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors[random.Next(instructors.Count)] },
+                new Department { Name = "Engineering", Budget = 350000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors[random.Next(instructors.Count)] },
+                new Department { Name = "Economics", Budget = 100000, StartDate = DateTime.Parse("01/09/2007"), Instructor  = instructors[random.Next(instructors.Count)] }
             };
 
-            foreach (Department d in departments)
-            {
-                context.Departments.Add(d);
-            }
-            context.SaveChanges();
+            await context.Departments.AddRangeAsync(departments);
+            await context.SaveChangesAsync();
 
 
             var courses = new Course[]
@@ -58,90 +53,34 @@ namespace ContosoUniversity.API.Data
                 new Course {Title = "Literature", Credits = 4, Department = departments.Single( s => s.Name == "English") },
             };
 
-            foreach (Course c in courses)
+            await context.Courses.AddRangeAsync(courses);
+            await context.SaveChangesAsync();
+
+            var studentFaker = new Faker<Student>()
+                .RuleFor(s => s.FirstName, f => f.Name.FirstName())
+                .RuleFor(s => s.LastName, f => f.Name.LastName())
+                .RuleFor(s => s.EnrollmentDate, f => f.Date.Past());
+
+            var students = studentFaker.Generate(10000);
+
+            await context.Student.AddRangeAsync(students);
+            await context.SaveChangesAsync();
+
+            var studentCourse = new List<StudentCourse>();
+
+            for (int i = 1; i <= 10000; i++)
             {
-                context.Courses.Add(c);
-            }
-            context.SaveChanges();
-
-
-            var students = new Student[]
-            {
-                new Student { FirstName = "Carson", LastName = "Alexander", EnrollmentDate = DateTime.Parse("01/09/2010")},
-                new Student { FirstName = "Meredith", LastName = "Alonso", EnrollmentDate = DateTime.Parse("01/09/2012") },
-                new Student { FirstName = "Arturo", LastName = "Anand", EnrollmentDate = DateTime.Parse("01/09/2013") },
-                new Student { FirstName = "Gytis", LastName = "Barzdukas", EnrollmentDate = DateTime.Parse("01/09/2012") },
-                new Student { FirstName = "Yan", LastName = "Li", EnrollmentDate = DateTime.Parse("01/09/2012") },
-                new Student { FirstName = "Peggy", LastName = "Justice", EnrollmentDate = DateTime.Parse("01/09/2011") },
-                new Student { FirstName = "Laura", LastName = "Norman", EnrollmentDate = DateTime.Parse("01/09/2013") },
-                new Student { FirstName = "Nino", LastName = "Olivetto", EnrollmentDate = DateTime.Parse("01/09/2005") }
-            };
-
-            foreach (Student s in students)
-            {
-                context.Student.Add(s);
-            }
-            context.SaveChanges();
-
-            var studentCourse = new StudentCourse[]
-            {
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Alexander").ID,
-                    CourseID = courses.Single(c => c.Title == "Chemistry" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Alexander").ID,
-                    CourseID = courses.Single(c => c.Title == "Microeconomics" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Alonso").ID,
-                    CourseID = courses.Single(c => c.Title == "Calculus" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Alonso").ID,
-                    CourseID = courses.Single(c => c.Title == "Trigonometry" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Alonso").ID,
-                    CourseID = courses.Single(c => c.Title == "Composition" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Anand").ID,
-                    CourseID = courses.Single(c => c.Title == "Chemistry" ).ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Anand").ID,
-                    CourseID = courses.Single(c => c.Title == "Microeconomics").ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Barzdukas").ID,
-                    CourseID = courses.Single(c => c.Title == "Chemistry").ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Li").ID,
-                    CourseID = courses.Single(c => c.Title == "Composition").ID
-                },
-                new StudentCourse {
-                    StudentID = students.Single(s => s.LastName == "Justice").ID,
-                    CourseID = courses.Single(c => c.Title == "Literature").ID
-                }
-            };
-
-
-            foreach (StudentCourse e in studentCourse)
-            {
-                var enrollmentInDataBase = context.StudentCourse.Where(
-                    s =>
-                            s.Student.ID == e.StudentID &&
-                            s.Course.ID == e.CourseID).SingleOrDefault();
-
-                if (enrollmentInDataBase == null)
-                {
-                    context.StudentCourse.Add(e);
-                }
+                studentCourse.Add(
+                    new StudentCourse
+                    {
+                        StudentID = i,
+                        CourseID = random.Next(courses.Length)
+                    });
             }
 
-            context.SaveChanges();
+            await context.StudentCourse.AddRangeAsync(studentCourse);
+
+            await context.SaveChangesAsync();
         }
 
     }

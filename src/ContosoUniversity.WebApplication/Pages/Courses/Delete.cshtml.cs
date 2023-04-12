@@ -48,7 +48,7 @@ namespace ContosoUniversity.WebApplication.Pages.Courses
                 return RedirectToPage("./Index");
             else
                 return RedirectToAction("./Delete", new { id, saveChangesError = true });
-            
+
         }
     }
 }

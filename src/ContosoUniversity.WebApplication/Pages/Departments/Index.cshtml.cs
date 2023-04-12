@@ -14,7 +14,7 @@ namespace ContosoUniversity.WebApplication.Pages.Departments
             this.client = client;
         }
 
-        public Models.APIViewModels.DepartmentResult Department { get;set; }
+        public Models.APIViewModels.DepartmentResult Department { get; set; }
 
         public async Task OnGetAsync()
         {
