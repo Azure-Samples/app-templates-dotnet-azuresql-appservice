@@ -1,5 +1,3 @@
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=518921454)
-
 # .NET MVC Web app, Azure SQL
 ## Introduction
 
@@ -8,6 +6,8 @@ Contoso University is a sample application that demonstrates how to use Entity F
 This sample application is structured in a way to be compatible with [Azure Developer CLI (azd) ](https://github.com/Azure/azure-dev/) which are currently in preview.
 
 > Refer to the [App Templates](https://github.com/microsoft/App-Templates) repo Readme for more samples that are compatible with [`azd`](https://github.com/Azure/azure-dev/).
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=518921454)
 
 ## Tech stack:
 
@@ -63,7 +63,7 @@ In Codespaces:
     - `Azure Subscription`: the Azure Subscriptoin your resources will be deployed.
     - `Azure Location`: The Azure location where your resources will be deployed. 
 
-### Using GitHub Action
+### Using GitHub Actions
 #### Fork the repository
 
 Fork the repository by clicking the 'Fork' button on the top right of the page.
