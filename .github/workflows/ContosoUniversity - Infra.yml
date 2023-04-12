@@ -11,17 +11,12 @@ on:
   workflow_dispatch:
   
 env:
-  AZ_RG_NAME: 'rg-csu45'
-  AZ_LOCATION: 'eastus'
-  AZ_SERVICE_PLAN: ${{secrets.AZURE_APP_NAME}}-asp
-  AZ_APP_NAME: ${{secrets.AZURE_APP_NAME}}-app
-  AZ_API_NAME: ${{secrets.AZURE_APP_NAME}}-api
-  AZ_INSIGHT_NAME: ${{secrets.AZURE_APP_NAME}}-appi
-  AZ_ANALYTICS_NAME: ${{secrets.AZURE_APP_NAME}}-la
-  AZ_SQL_SERVER_NAME: ${{secrets.AZURE_APP_NAME}}-sql
-  AZ_SQL_SERVER_LOGIN: 'sqluser'
+  AZ_ENVIRONMENT_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}
+  AZ_LOCATION: ${{ secrets.AZURE_LOCATION }}
+  AZ_APP_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-app
+  AZ_API_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-api
   AZ_SQL_SERVER_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
-  AZ_SQL_DATABASE_NAME: ${{secrets.AZURE_APP_NAME}}-Db
+  AZ_APP_PASSWORD: ${{secrets.AZURE_APP_PASSWORD}}
 
 jobs:
   infra:
@@ -36,17 +31,14 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - run: echo ${{ env.AZ_RG_NAME }}
-
     - name: Deploy Template
       uses: Azure/arm-deploy@v1.0.8
       with:
         scope: subscription
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         region: ${{ env.AZ_LOCATION }}
-        resourceGroupName: ${{ env.AZ_RG_NAME }}
         template: infra/main.bicep
         deploymentMode: Incremental
         deploymentName: 'gh-actions'
-        parameters: environmentName=${{secrets.AZURE_APP_NAME}} resourceGroupName=${{ env.AZ_RG_NAME }} location=${{ env.AZ_LOCATION }} sqlAdministratorLoginPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} 
+        parameters: environmentName=${{ env.AZ_ENVIRONMENT_NAME }} location=${{ env.AZ_LOCATION }} apiServiceName=${{ env.AZ_API_NAME }} webServiceName=${{ env.AZ_APP_NAME }} sqlAdminPassword=${{ env.AZ_SQL_SERVER_PASSWORD }} appUserPassword=${{ env.AZ_APP_PASSWORD }}
         failOnStdErr: false
