@@ -106,19 +106,21 @@ Create an [Azure Service Principal](https://docs.microsoft.com/en-us/cli/azure/c
    ```
  * Store the output JSON as the value of a GitHub Actions secret named 'AZURE_CREDENTIALS'
    + Under your repository name, click Settings. 
-   + In the "Security" section of the sidebar, select Secrets. 
-   + At the top of the page, click New repository secret
+   + In the "Security" section of the sidebar, select "Secrets and variables". Choose the "Actions" category. 
+   + At the top of the page, click "New repository secret"
    + Provide the secret name as AZURE_CREDENTIALS
    + Add the output JSON as secret value
- * Create AZURE_SUBSCRIPTION_ID as a new Repository secret and provide the {subscription-id} as value.
+ * Create AZURE_SUBSCRIPTION_ID as an additional repository secret and provide the {subscription-id} as value.
    
 #### Azure Resource Prefix
 
 Create AZURE_ENVIRONMENT_NAME as a new Repository Secret and provide a secret value. This will be used as the prefix for webapp and web api names.
+The name should be unique, lowercase, and free of spaces and special characters other than numbers and letters.
 
 #### Azure location
 
-Create AZURE_LOCATION as a new Repository Secret and provide a secret value. 
+Create AZURE_LOCATION as a new Repository Secret and provide a location value. (for example: eastus) 
+The value will be used to determine the Azure data center location where the deployment will take place.
 
 #### Azure SQL Configuration
 
@@ -127,20 +129,20 @@ Create AZURE_LOCATION as a new Repository Secret and provide a secret value.
 
 #### GitHub Workflow 
 Run the GitHub Action workflow "ContosoUniversity-Infra"
-* If workflows are enabled for this repository it should run automatically. To enable the workflow run automatically, Go to Actions and enable the workflow if needed.
+* If workflows are enabled for this repository it should run automatically. To enable the workflow to run automatically, go to Actions and enable the workflow if needed.
 * Workflow can be manually run 
      + Under your repository name, click Actions .
      + In the left sidebar, click the workflow "ContosoUniversity-Infra".
      + Above the list of workflow runs, select Run workflow .
      + Use the Branch dropdown to select the workflow's main branch, Click Run workflow .
 
-After deployment, below resources will be created
+After deployment, the below resources will be created
 
 <img width="542" alt="image" src="https://user-images.githubusercontent.com/61921020/175617180-401ffc9b-1ccf-4b2d-af53-61473843fc22.png">
 
 ### Deploy Application
 
-1. Create new secret for connection string - AZURE_CONTOSO_CONN_STRING. For secret value, copy the connection string by navigating to Azure SqlServer DB via portal, change {your_password} with AZURE_PASSWORD secret value. 
+1. Create new secret for connection string - AZURE_CONTOSO_CONN_STRING. For the secret value, copy the connection string by navigating to Azure SqlServer DB via the Azure portal, change {your_password} to the AZURE_SQL_PASSWORD secret value. 
 
 ![SQLConnectionString](https://user-images.githubusercontent.com/61921020/175643833-13319e8d-8610-4259-a71e-5de54d3250eb.jpg)
 
@@ -157,7 +159,7 @@ After deployment, below resources will be created
 3. Run the GitHub Actions workflow "ContosoUniversity"
 * If workflows are enabled for this repository it should run automatically. To enable the workflow run automatically, Go to Actions and enable the workflow if needed.
 * Workflow can be manually run 
-     + Under your repository name, click Actions .
+     + Under your repository name, click Actions.
      + In the left sidebar, click the workflow "ContosoUniversity".
      + Above the list of workflow runs, select Run workflow .
      + Use the Branch dropdown to select the workflow's main branch, Click Run workflow .
