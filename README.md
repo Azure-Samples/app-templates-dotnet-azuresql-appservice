@@ -18,6 +18,7 @@ This sample application is structured in a way to be compatible with [Azure Deve
 - App Insights
 - Log Analytics
 - Bicep
+- Azure Key Vault
 
 ## Application Architecture
 This application utilizes the following Azure resources:
