@@ -24,13 +24,11 @@ This sample application is structured in a way to be compatible with [Azure Deve
 ## Application Architecture
 This application utilizes the following Azure resources:
 
-Azure App Services to host the Web frontend and API backend
-
-Azure SQL DB for storage
-
-Azure App Insights for monitoring 
-
-Log Analystics for logging
+- Azure App Services to host the Web frontend and API backend
+- Azure SQL DB for storage
+- Azure App Insights for monitoring 
+- Log Analystics for logging
+- Load Testing to generate high-scale load and simulates traffic for the web app
 
 Here's a high level architecture diagram that illustrates these components. Notice that these are all contained within a single resource group, that will be created for you when you create the resources.
 
@@ -171,6 +169,19 @@ After deployment, the below resources will be created
 Once successfully deployed, the application is accessible through the webapp appservice endpoint hostname ending in -app.azurewebsites.net. Under your resource group, you can look at the "App Service" resource with "-app" suffixed to its name through the [Azure Portal](https://portal.azure.com) 
 
 <img width="497" alt="image" src="https://user-images.githubusercontent.com/61921020/218220729-2dcc60cb-b3b6-47a9-9f62-508d2be83490.png">
+
+### Load Testing
+[Azure Load Testing](https://learn.microsoft.com/en-us/azure/load-testing/overview-what-is-azure-load-testing) is a fully managed load-testing service that enables you to generate high-scale load. The service simulates traffic for your applications, regardless of where they're hosted. Developers, testers, and quality assurance (QA) engineers can use it to optimize application performance, scalability, or capacity.
+
+Azure Load Testing enables you to take an existing Apache JMeter script, and use it to run a load test at cloud scale.
+After the infrastructure provisioning and application deployment, 
+1. Go to portal and select the load testing resource  
+2. Upload the JMeter script infra/http-test.jmx 
+3. Set the host name to the deployed webapp name "app-web-***.azurewebsites.net", Then select "Review + Create"
+4. Test will automatically run, if not select the test and manually run
+5. Below load test results image shows the various tests run in temrs of number of virtual users, response time, number of requests. 
+
+![ALT Results](https://user-images.githubusercontent.com/61921020/234661569-8fe773e3-41ba-47d2-9356-9a0c442424ed.jpg)
 
 
 ### Clean up resources
