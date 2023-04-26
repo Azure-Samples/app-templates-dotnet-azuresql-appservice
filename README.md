@@ -19,6 +19,7 @@ This sample application is structured in a way to be compatible with [Azure Deve
 - Log Analytics
 - Bicep
 - Azure Key Vault
+- Azure Load Testing
 
 ## Application Architecture
 This application utilizes the following Azure resources:
