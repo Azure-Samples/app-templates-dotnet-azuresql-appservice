@@ -44,18 +44,22 @@ jobs:
       run: dotnet test src/ContosoUniversity.Test/ContosoUniversity.Test.csproj --verbosity normal --logger trx --results-directory TestResults
       
     - name: Publish APP
+      if: ${{ github.event_name != 'pull_request' }}  
       run: dotnet publish --configuration ${{ env.CONFIGURATION }} --output PublishApp src/ContosoUniversity.WebApplication/ContosoUniversity.WebApplication.csproj
 
     - name: Publish API
+      if: ${{ github.event_name != 'pull_request' }}
       run: dotnet publish --configuration ${{ env.CONFIGURATION }} --output PublishApi src/ContosoUniversity.API/ContosoUniversity.API.csproj
     
     - name: Upload APP results
+      if: ${{ github.event_name != 'pull_request' }}
       uses: actions/upload-artifact@v2
       with:
         name: app
         path: PublishApp
     
     - name: Upload API results
+      if: ${{ github.event_name != 'pull_request' }}
       uses: actions/upload-artifact@v2
       with:
         name: api
@@ -63,6 +67,7 @@ jobs:
   
   release:
     needs: build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
