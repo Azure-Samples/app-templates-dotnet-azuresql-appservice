@@ -15,7 +15,7 @@ env:
   AZ_LOCATION: ${{ secrets.AZURE_LOCATION }}
   AZ_APP_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-app
   AZ_API_NAME: ${{ secrets.AZURE_ENVIRONMENT_NAME }}-api
-  AZ_SQL_SERVER_PASSWORD: ${{ ${{'secrets.AZURE_SQL_PASSWORD'}} }}
+  AZ_SQL_SERVER_PASSWORD: ${{ '${{secrets.AZURE_SQL_PASSWORD}}' }}
   AZ_APP_PASSWORD: ${{secrets.AZURE_APP_PASSWORD}}
 
 jobs:
