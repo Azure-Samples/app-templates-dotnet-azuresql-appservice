@@ -22,6 +22,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{66743DFB
 		..\infra\SQLServer.bicep = ..\infra\SQLServer.bicep
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actions", "actions", "{6AFAAF4D-67B0-496F-A326-D1CE3CCF6DA8}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\ContosoUniversity - Infra.yml = ..\.github\workflows\ContosoUniversity - Infra.yml
+		..\.github\workflows\ContosoUniversity.yml = ..\.github\workflows\ContosoUniversity.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
