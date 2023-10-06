@@ -5,7 +5,7 @@ Approved Packages (wiki here)[https://emergentcode.visualstudio.com/Emergent%20S
 
 ## Introduction
 
-Contoso University is a sample application that demonstrates how to use Entity Framework Core in an ASP.NET Core Razor Pages web app. This app can be deployed to Microsoft's Azure cloud platform that allows you to build, deploy, and scale web apps.
+This repo demonstrates Emergent Software's best practices utilizing  Entity Framework Core in an ASP.NET Core Razor Pages web app.
 
 ## Tech stack:
 
