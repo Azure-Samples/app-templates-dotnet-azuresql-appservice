@@ -1,9 +1,11 @@
 # Emergent Software .NET MVC Web app, Azure SQL, Bicep, and Github Actions
+
+## Guidelines
+Approved Packages (wiki here)[https://emergentcode.visualstudio.com/Emergent%20Software/_wiki/wikis/Emergent-Software.wiki/429/Packages-for-.NET]
+
 ## Introduction
 
 Contoso University is a sample application that demonstrates how to use Entity Framework Core in an ASP.NET Core Razor Pages web app. This app can be deployed to Microsoft's Azure cloud platform that allows you to build, deploy, and scale web apps.
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=518921454)
 
 ## Tech stack:
 
