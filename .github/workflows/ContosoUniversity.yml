@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
     
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@871f041373faaad213a635d9afb62905ec029bbb # v1.10.1
       with:
         dotnet-version: '6.0.x'
     
@@ -50,13 +50,13 @@ jobs:
       run: dotnet publish --configuration ${{ env.CONFIGURATION }} --output PublishApi src/ContosoUniversity.API/ContosoUniversity.API.csproj
     
     - name: Upload APP results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # v2.3.1
       with:
         name: app
         path: PublishApp
     
     - name: Upload API results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # v2.3.1
       with:
         name: api
         path: PublishApi
@@ -67,19 +67,19 @@ jobs:
 
     steps:
       - name: Download APP Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@cbed621e49e4c01b044d60f6c80ea4ed6328b281 # v2.1.1
         with:
           name: app
           path: app-artifact
       
       - name: Download API Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@cbed621e49e4c01b044d60f6c80ea4ed6328b281 # v2.1.1
         with:
           name: api
           path: api-artifact
       
       - name: Variable Substitution API
-        uses: microsoft/variable-substitution@v1
+        uses: microsoft/variable-substitution@6287962da9e5b6e68778dc51e840caa03ca84495 # v1
         with:
           files: api-artifact/appsettings.json
         env:
@@ -87,7 +87,7 @@ jobs:
           ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
       
       - name: Variable Substitution APP
-        uses: microsoft/variable-substitution@v1
+        uses: microsoft/variable-substitution@6287962da9e5b6e68778dc51e840caa03ca84495 # v1
         with:
           files: app-artifact/appsettings.json
         env:
@@ -95,18 +95,18 @@ jobs:
           ApplicationInsights.ConnectionString: ${{ secrets.AZURE_CONTOSO_APP_INSIGHTS }}
       
       - name: Azure Login
-        uses: Azure/login@v1.4.4
+        uses: Azure/login@ec3c14589bd3e9312b3cc8c41e6860e258df9010 # v1.4.4
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy API
-        uses: azure/webapps-deploy@v2.2.3
+        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e # v2.2.3
         with:
           app-name: ${{ env.AZ_API_NAME }}
           package: api-artifact
       
       - name: Deploy APP
-        uses: azure/webapps-deploy@v2.2.3
+        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e # v2.2.3
         with:
           app-name: ${{ env.AZ_APP_NAME }}
           package: app-artifact

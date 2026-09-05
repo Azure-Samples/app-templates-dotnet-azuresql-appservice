@@ -24,15 +24,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
 
     - name: Azure Login
-      uses: Azure/login@v1.4.4
+      uses: Azure/login@ec3c14589bd3e9312b3cc8c41e6860e258df9010 # v1.4.4
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Deploy Template
-      uses: Azure/arm-deploy@v1.0.8
+      uses: Azure/arm-deploy@384dc49e9ae811d3a817862699bb240e2aac230b # v1.0.8
       with:
         scope: subscription
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
