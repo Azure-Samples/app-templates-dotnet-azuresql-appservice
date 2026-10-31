@@ -1,1 +1,20 @@
 .azure/
+
+# Terraform downloaded files
+**/.terraform/
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+
+# Saved plans and crash logs
+*.tfplan
+crash.log
+crash.*.log
+
+# Local variable values
+*.tfvars
+*.tfvars.json
+
+# Ignore backend files
+backend.hcl

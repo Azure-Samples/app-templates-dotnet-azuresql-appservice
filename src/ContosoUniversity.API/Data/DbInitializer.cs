@@ -17,7 +17,34 @@ namespace ContosoUniversity.API.Data
             // Look for any students.
             if (context.Student.Any())
             {
-                return;   // DB has been seeded
+                if (!context.StudentCourse.Any())
+                {
+                    var existingStudents = context.Student.ToList();
+                    var existingCourses = context.Courses.ToList();
+
+                    if (existingCourses.Count == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "Cannot link students because no courses exist.");
+                    }
+
+                    var links = new List<StudentCourse>();
+
+                    foreach (var student in existingStudents)
+                    {
+                        links.Add(new StudentCourse
+                        {
+                            StudentID = student.ID,
+                            CourseID = existingCourses[
+                                random.Next(existingCourses.Count)].ID
+                        });
+                    }
+
+                    await context.StudentCourse.AddRangeAsync(links);
+                    await context.SaveChangesAsync();
+                }
+
+                return;
             }
 
             var instructorFaker = new Faker<Instructor>()
@@ -68,13 +95,13 @@ namespace ContosoUniversity.API.Data
 
             var studentCourse = new List<StudentCourse>();
 
-            for (int i = 1; i <= 10000; i++)
+            foreach (var student in students)
             {
                 studentCourse.Add(
                     new StudentCourse
                     {
-                        StudentID = i,
-                        CourseID = random.Next(courses.Length)
+                        StudentID = student.ID,
+                        CourseID = courses[random.Next(courses.Length)].ID
                     });
             }
 

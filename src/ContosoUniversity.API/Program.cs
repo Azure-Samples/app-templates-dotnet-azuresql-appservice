@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +27,14 @@ builder.Services.AddDbContext<ContosoUniversityAPIContext>(options =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddOpenApiDocument();
 builder.Services.AddApplicationInsightsTelemetry(builder.Configuration);
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration>(
+        config => config.DisableTelemetry = true);
+}
 
 var app = builder.Build();
 

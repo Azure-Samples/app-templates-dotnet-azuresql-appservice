@@ -14,6 +14,13 @@
 .terraform/
 *.tfstate
 *.tfstate.backup
+*.tfplan
+crash.log
+**/.terraform/
+
+# local variable values
+*.tfvars
+*.tfvars.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

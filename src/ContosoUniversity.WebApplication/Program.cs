@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,12 @@ if (builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] != null)
 } else
 {
     builder.Services.AddApplicationInsightsTelemetry();
+}
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration>(
+        config => config.DisableTelemetry = true);
 }
 
 var app = builder.Build();
